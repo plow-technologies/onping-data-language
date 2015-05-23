@@ -38,8 +38,10 @@ import Numeric.Natural
 import Numeric (showFFloat)
 import Data.List (intercalate)
 import Data.Monoid ((<>))
+import Control.Applicative ((<|>))
 import Control.Monad (forM_, unless)
 import Control.Exception (try, displayException, SomeException)
+import Data.Bifunctor (bimap)
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -168,6 +170,13 @@ instance (FromValue a, ToValue b) => ToValue (a -> b) where
     case fromValue v of
       Just x -> toValue $ f x
       _ -> VError TypeError
+
+instance (ToValue a, ToValue b) => ToValue (Either a b) where
+  toValue (Left a) = toValue a
+  toValue (Right b) = toValue b
+
+instance (FromValue a, FromValue b) => FromValue (Either a b) where
+  fromValue v = (Left <$> fromValue v) <|> (Right <$> fromValue v)
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -344,25 +353,16 @@ prelude :: Eval ()
 prelude = do
   -- Numerical operations
   ---- Int
-  assign "+" ((+) :: Int -> Int -> Int)
-  assign "-" ((-) :: Int -> Int -> Int)
-  assign "*" ((*) :: Int -> Int -> Int)
-  assign "/" (div :: Int -> Int -> Int)
-  assign "=" ((==) :: Int -> Int -> Bool)
+  assign "+"  (bimap (+) (+) :: Either Int Double -> Either (Int -> Int) (Double -> Double))
+  assign "-"  (bimap (-) (-) :: Either Int Double -> Either (Int -> Int) (Double -> Double))
+  assign "*"  (bimap (*) (*) :: Either Int Double -> Either (Int -> Int) (Double -> Double))
+  assign "/"  (bimap div (/) :: Either Int Double -> Either (Int -> Int) (Double -> Double))
+  assign "="  ((==) :: Int -> Int -> Bool)
   assign "/=" ((/=) :: Int -> Int -> Bool)
-  assign "<=" ((<=) :: Int -> Int -> Bool)
-  assign ">=" ((>=) :: Int -> Int -> Bool)
-  assign ">" ((>) :: Int -> Int -> Bool)
-  assign "<" ((<) :: Int -> Int -> Bool)
-  ---- Double
-  assign "+." ((+) :: Double -> Double -> Double)
-  assign "-." ((-) :: Double -> Double -> Double)
-  assign "*." ((*) :: Double -> Double -> Double)
-  assign "/." ((/) :: Double -> Double -> Double)
-  assign "<=." ((<=) :: Double -> Double -> Bool)
-  assign ">=." ((>=) :: Double -> Double -> Bool)
-  assign ">." ((>) :: Double -> Double -> Bool)
-  assign "<." ((<) :: Double -> Double -> Bool)
+  assign "<=" (bimap (<=) (<=) :: Either Int Double -> Either (Int -> Bool) (Double -> Bool))
+  assign ">=" (bimap (>=) (>=) :: Either Int Double -> Either (Int -> Bool) (Double -> Bool))
+  assign ">"  (bimap (>)  (>)  :: Either Int Double -> Either (Int -> Bool) (Double -> Bool))
+  assign "<"  (bimap (<)  (<)  :: Either Int Double -> Either (Int -> Bool) (Double -> Bool))
   -- Arrays
   assign "length" (length :: [Value] -> Int)
   assign "!" ((!!) :: [Value] -> Int -> Value)

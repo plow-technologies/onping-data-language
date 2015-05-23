@@ -70,18 +70,12 @@ p_Exp = buildExpressionParser op_table p_Term
   where
     op_table =
       [ [ Infix (p_Op "!" ) AssocLeft ]
-      , [ Infix (p_Op "*" ) AssocLeft , Infix (p_Op "/" ) AssocLeft
-        , Infix (p_Op "*.") AssocLeft , Infix (p_Op "/.") AssocLeft
-          ]
-      , [ Infix (p_Op "+" ) AssocLeft , Infix (p_Op "-" ) AssocLeft
-        , Infix (p_Op "+.") AssocLeft , Infix (p_Op "-.") AssocLeft
-          ]
+      , [ Infix (p_Op "*" ) AssocLeft , Infix (p_Op "/" ) AssocLeft ]
+      , [ Infix (p_Op "+" ) AssocLeft , Infix (p_Op "-" ) AssocLeft ]
       , [ Infix (p_Op "++") AssocRight ]
-      , [ Infix (p_Op "=" ) AssocNone , Infix (p_Op "/=" ) AssocNone
-        , Infix (p_Op "<=") AssocNone , Infix (p_Op "<=.") AssocNone
-        , Infix (p_Op ">=") AssocNone , Infix (p_Op ">=.") AssocNone
-        , Infix (p_Op ">" ) AssocNone , Infix (p_Op ">." ) AssocNone
-        , Infix (p_Op "<" ) AssocNone , Infix (p_Op "<." ) AssocNone
+      , [ Infix (p_Op "=" ) AssocNone , Infix (p_Op "/=") AssocNone
+        , Infix (p_Op "<=") AssocNone , Infix (p_Op ">=") AssocNone
+        , Infix (p_Op ">" ) AssocNone , Infix (p_Op "<" ) AssocNone
           ]
       , [ Infix (p_Op "&" ) AssocRight ]
       , [ Infix (p_Op "|" ) AssocRight ]
