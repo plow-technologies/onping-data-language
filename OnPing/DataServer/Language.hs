@@ -352,7 +352,6 @@ runScript = mapM_ doLAction
 prelude :: Eval ()
 prelude = do
   -- Numerical operations
-  ---- Int
   assign "+"  (bimap (+) (+) :: Either Int Double -> Either (Int -> Int) (Double -> Double))
   assign "-"  (bimap (-) (-) :: Either Int Double -> Either (Int -> Int) (Double -> Double))
   assign "*"  (bimap (*) (*) :: Either Int Double -> Either (Int -> Int) (Double -> Double))
