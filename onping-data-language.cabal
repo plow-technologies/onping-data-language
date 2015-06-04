@@ -21,10 +21,13 @@ library
                , containers
                , transformers
                , parsec
+               , template-haskell
+               , vector
+               , microtimer
   default-language:    Haskell2010
   exposed-modules: OnPing.DataServer.Language
                    OnPing.DataServer.Language.Parser
-  ghc-options: -Wall -O2
+  ghc-options: -Wall -O2 -ddump-splices
 
 executable opdl-c
   default-language: Haskell2010

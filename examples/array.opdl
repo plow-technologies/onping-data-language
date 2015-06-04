@@ -1,0 +1,7 @@
+!newarray arr [100]
+!setarray arr [50] [20]
+!assert [ arr[50] = 20 ]
+:isolate
+  !setarray arr [60] [10]
+:end
+!print [arr[60]] # Must print Void

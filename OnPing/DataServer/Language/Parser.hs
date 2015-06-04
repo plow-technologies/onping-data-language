@@ -1,4 +1,5 @@
 
+{-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 
 module OnPing.DataServer.Language.Parser (
@@ -15,9 +16,13 @@ import Data.Text (Text, pack)
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
 import Control.Monad (void)
+-- TH
+import qualified Language.Haskell.TH as TH
+import OnPing.DataServer.Language.TH
+import Data.Char (toLower)
 
 p_Ident :: Parser Ident
-p_Ident = (:) <$> letter <*> many alphaNum
+p_Ident = fmap Ident $ (:) <$> letter <*> many alphaNum
 
 p_Var :: Parser Exp
 p_Var = EVar <$> p_Ident
@@ -38,9 +43,21 @@ p_Text = do
   str <- manyTill anyChar $ char '\"'
   return $ EText $ pack str
 
+p_Arr :: Parser Exp
+p_Arr = do
+  i <- p_Ident
+  optional forcedSpace
+  char '['
+  skipMany $ char ' '
+  e <- p_Exp
+  skipMany $ char ' '
+  char ']'
+  return $ EArr i e
+
 p_SimpleExp :: Parser Exp
 p_SimpleExp = choice
-  [ p_Var <?> "variable"
+  [ try p_Arr <?> "array element"
+  , p_Var <?> "variable"
   , try p_Double <?> "double"
   , p_Int <?> "int"
   , p_Text <?> "text"
@@ -50,20 +67,24 @@ p_SimpleExp = choice
         return e) <?> "parenthesized expression"
     ]
 
-p_Term :: Parser Exp
-p_Term = fmap (foldl1 EApp) $ many1 $ do
+spaced :: Parser a -> Parser a
+spaced p = do
   try $ many $ char ' '
-  se <- p_SimpleExp
+  x <- p
   many $ char ' '
-  return se
+  return x
 
-p_Op :: Ident -> Parser (Exp -> Exp -> Exp)
+forcedSpace :: Parser ()
+forcedSpace = void $ many1 $ char ' '
+
+p_Term :: Parser Exp
+p_Term = fmap (foldl1 EApp) $ many1 $ spaced p_SimpleExp
+
+p_Op :: String -> Parser (Exp -> Exp -> Exp)
 p_Op n = try $ do
-  many $ char ' '
-  string n
+  spaced $ string n
   lookAhead $ noneOf "!*./+-=<>&|"
-  many $ char ' '
-  return $ EApp . EApp (EVar n)
+  return $ EApp . EApp (EVar $ Ident n)
 
 p_Exp :: Parser Exp
 p_Exp = buildExpressionParser op_table p_Term 
@@ -84,64 +105,66 @@ p_Exp = buildExpressionParser op_table p_Term
 p_Action :: Parser Action
 p_Action = choice
   [ (do v <- p_Ident
-        skipMany $ char ' '
-        char '='
-        skipMany $ char ' '
+        spaced $ char '='
         e <- p_Exp
-        return $ Assign v e) <?> "assignment"
+        return $ Assignment v e) <?> "assignment"
   , try $ do char ':'
-             p_Control
+             ActControl <$> p_Control
   , (do char '!'
-        Exec <$> p_Command) <?> "command"
+        ActCommand <$> p_Command) <?> "command"
     ]
 
-p_Control :: Parser Action
-p_Control = choice
-  [ do string "while"
-       many1 $ char ' '
-       e <- p_Exp
-       skipMany $ char ' '
-       newline
-       spaces
-       scr <- p_Script
-       string ":end"
-       return $ While e scr
-  , do string "foreach"
-       many1 $ char ' '
-       arr <- p_Ident
-       many1 $ char ' '
-       v <- p_Ident
-       skipMany $ char ' '
-       newline
-       spaces
-       scr <- p_Script
-       string ":end"
-       return $ ForEach arr v scr
-  , do string "isolate"
-       manyTill (char ' ') newline
-       spaces
-       scr <- p_Script
-       string ":end"
-       return $ Isolate scr
-    ]
+class Argument a where
+  p_Arg :: Parser a
+
+instance Argument Exp where
+  p_Arg = char '[' *> spaced p_Exp <* char ']'
+
+instance Argument Ident where
+  p_Arg = p_Ident
+
+p_Control :: Parser Control
+p_Control = choice $(do
+  info <- TH.reify $ TH.mkName "Control"
+  case info of
+    TH.TyConI typeDec ->
+      case typeDec of
+        TH.DataD _ _ _ cs _ -> do
+          let f (TH.NormalC c ts0) = do
+                  let ts = init ts0
+                  ps <- mapM (\_ -> [|forcedSpace *> p_Arg|]) ts
+                  let n = fmap toLower $ TH.nameBase c
+                  [| do try (string n)
+                        r <- $(return $ th_App (TH.ConE c) ps)
+                        skipMany $ char ' '
+                        newline
+                        spaces
+                        scr <- p_Script
+                        string ":end"
+                        return (r scr)
+                   |]
+              f _ = fail "Unexpected constructor."
+          TH.ListE <$> mapM f cs
+        _ -> fail "Type Control found, but not its declaration."
+    _ -> fail "Type Control not found."
+  )
 
 p_Command :: Parser Command
-p_Command = choice
-  [ do string "print"
-       many1 $ char ' '
-       e <- p_Exp
-       return $ Print e
-  , do string "exit"
-       return Exit
-  , do string "assert"
-       many1 $ char ' '
-       e <- p_Exp
-       return $ Assert e
-  , do string "getallkeys"
-       many1 $ char ' '
-       v <- p_Ident
-       return $ GetAllKeys v
-    ]
+p_Command = choice $(do
+  info <- TH.reify $ TH.mkName "Command"
+  case info of
+    TH.TyConI typeDec ->
+      case typeDec of
+        TH.DataD _ _ _ cs _ -> do
+          let f (TH.NormalC c ts) = do
+                  ps <- mapM (\_ -> [|forcedSpace *> p_Arg|]) ts
+                  let n = fmap toLower $ TH.nameBase c
+                  [| do try (string n) ; $(return $ th_App (TH.ConE c) ps) |]
+              f _ = fail "Unexpected constructor."
+          TH.ListE <$> mapM f cs
+        _ -> fail "Type Command found, but not its declaration."
+    _ -> fail "Type Command not found."
+  )
 
 p_LAction :: Parser LabeledAction
 p_LAction = do
