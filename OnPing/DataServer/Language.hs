@@ -339,6 +339,8 @@ data Command =
   | SetArray Ident Exp Exp
   | GetAllKeys Ident
   | RemoveKey Exp
+  | GetTimeBounds Ident Ident
+  | SetTimeBounds Exp Exp
     deriving (Show, Generic)
 
 runCommand :: Command -> Eval ()
@@ -360,6 +362,14 @@ runCommand (SetArray v ei ex) = do
   liftIO $ V.unsafeWrite arr i x
 runCommand (GetAllKeys arr) = clientActionE clientAllKeys >>= listArray arr
 runCommand (RemoveKey k) = evalExp k >>= clientActionM . clientRemove
+runCommand (GetTimeBounds lbv ubv) = do
+  (lb,ub) <- clientActionE clientGetTimeBounds
+  assign lbv lb
+  assign ubv ub
+runCommand (SetTimeBounds lbe ube) = do
+  lb <- evalExp lbe
+  ub <- evalExp ube
+  clientActionM $ clientSetTimeBounds (lb,ub)
 
 clientAction :: Client IO a -> Eval a
 clientAction c = do
