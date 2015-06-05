@@ -338,6 +338,7 @@ data Command =
   | NewArray Ident Exp
   | SetArray Ident Exp Exp
   | GetAllKeys Ident
+  | RemoveKey Exp
     deriving (Show, Generic)
 
 runCommand :: Command -> Eval ()
@@ -358,6 +359,7 @@ runCommand (SetArray v ei ex) = do
   x <- evalExp ex
   liftIO $ V.unsafeWrite arr i x
 runCommand (GetAllKeys arr) = clientActionE clientAllKeys >>= listArray arr
+runCommand (RemoveKey k) = evalExp k >>= clientActionM . clientRemove
 
 clientAction :: Client IO a -> Eval a
 clientAction c = do
