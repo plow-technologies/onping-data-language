@@ -6,7 +6,7 @@
 !print <Value expression>
 ```
 
-_This command has note been documented yet._
+_This command has not been documented yet._
 
 ## exit
 
@@ -22,7 +22,7 @@ Interrupt the execution of the script by sending an `Exit` error.
 !assert <Bool expression>
 ```
 
-_This command has note been documented yet._
+_This command has not been documented yet._
 
 ## newarray
 
@@ -30,7 +30,7 @@ _This command has note been documented yet._
 !newarray <identifier> <Int expression>
 ```
 
-_This command has note been documented yet._
+_This command has not been documented yet._
 
 ## setarray
 
@@ -38,7 +38,7 @@ _This command has note been documented yet._
 !setarray <identifier> <Int expression> <Value expression>
 ```
 
-_This command has note been documented yet._
+_This command has not been documented yet._
 
 ## getallkeys
 
@@ -46,7 +46,7 @@ _This command has note been documented yet._
 !getallkeys <identifier>
 ```
 
-_This command has note been documented yet._
+_This command has not been documented yet._
 
 ## removekey
 
@@ -54,7 +54,7 @@ _This command has note been documented yet._
 !removekey <Key expression>
 ```
 
-_This command has note been documented yet._
+_This command has not been documented yet._
 
 ## gettimebounds
 
@@ -62,7 +62,7 @@ _This command has note been documented yet._
 !gettimebounds <identifier> <identifier>
 ```
 
-_This command has note been documented yet._
+_This command has not been documented yet._
 
 ## settimebounds
 
@@ -70,6 +70,6 @@ _This command has note been documented yet._
 !settimebounds <Int expression> <Int expression>
 ```
 
-_This command has note been documented yet._
+_This command has not been documented yet._
 
 

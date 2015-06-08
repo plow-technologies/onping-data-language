@@ -47,7 +47,7 @@ allCommands = $(fmap TH.ListE $ th_Type "Command" $ \c ts -> return $ foldl (\r 
 -- | Explanation of commands using markdown.
 commandExplanation :: Command -> String
 commandExplanation Exit = "Interrupt the execution of the script by sending an `Exit` error."
-commandExplanation _ = "_This command has note been documented yet._"
+commandExplanation _ = "_This command has not been documented yet._"
 
 -- commandName :: Command -> String
 $(fmap (pure . TH.FunD "commandName") $ th_Type "Command" $ \c ts -> do
