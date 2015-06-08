@@ -1,5 +1,5 @@
 
-{-# LANGUAGE OverloadedStrings, DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module OnPing.DataServer.Language (
     -- * Values
@@ -41,7 +41,6 @@ import Control.Applicative ((<|>))
 import Control.Monad (unless, when)
 import Control.Exception (try, displayException, SomeException)
 import Data.Bifunctor (bimap)
-import GHC.Generics (Generic)
 import Data.String (IsString (..))
 import Data.Vector.Mutable (IOVector)
 import qualified Data.Vector.Mutable as V
@@ -176,14 +175,13 @@ newtype Ident = Ident String deriving (Eq, Ord, Show)
 instance IsString Ident where
   fromString = Ident
 
-data Exp =
+data Exp a =
     EVar Ident
-  | EArr Ident Exp
+  | EArr Ident (Exp Int)
   | EInt Int
   | EDouble Double
   | EText Text
-  | EApp Exp Exp
-    deriving Show
+  | EApp (Exp Value) (Exp Value)
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -230,7 +228,7 @@ valueOf v = do
     Just x -> castValue x
     _ -> throwE $ Undefined v
 
-evalExp :: FromValue a => Exp -> Eval a
+evalExp :: FromValue a => Exp a -> Eval a
 evalExp (EVar v) = valueOf v
 evalExp (EArr arr e) = do
   v <- arrayIn arr
@@ -264,10 +262,9 @@ listArray v xs = do
 -- Actions
 
 data Action =
-    Assignment Ident Exp
+    Assignment Ident (Exp Value)
   | ActCommand Command
   | ActControl Control
-    deriving Show
 
 assign :: ToValue a => Ident -> a -> Eval ()
 assign v x = lift $ modify $ \ct -> ct { namespace = M.insert v (toValue x) $ namespace ct }
@@ -283,7 +280,7 @@ runAction (ActControl ctrl) = runControl ctrl
 data LabeledAction = LAction
   { actionLine :: Int
   , theAction :: Action
-    } deriving Show
+    }
 
 runLAction :: LabeledAction -> Eval ()
 runLAction lact = do
@@ -295,10 +292,9 @@ runLAction lact = do
 -- Control
 
 data Control =
-    While Exp Script
+    While (Exp Bool) Script
   | ForEach Ident Ident Script
   | Isolate Script
-    deriving (Show, Generic)
 
 runControl :: Control -> Eval ()
 runControl (While e scr) = do
@@ -332,16 +328,15 @@ runControl (Isolate scr) = do
 -- Commands
 
 data Command =
-    Print Exp
+    Print (Exp Value)
   | Exit
-  | Assert Exp
-  | NewArray Ident Exp
-  | SetArray Ident Exp Exp
+  | Assert (Exp Bool)
+  | NewArray Ident (Exp Int)
+  | SetArray Ident (Exp Int) (Exp Value)
   | GetAllKeys Ident
-  | RemoveKey Exp
+  | RemoveKey (Exp Key)
   | GetTimeBounds Ident Ident
-  | SetTimeBounds Exp Exp
-    deriving (Show, Generic)
+  | SetTimeBounds (Exp Int) (Exp Int)
 
 runCommand :: Command -> Eval ()
 runCommand (Print e) = evalExp e >>= liftIO . putStrLn . displayValue

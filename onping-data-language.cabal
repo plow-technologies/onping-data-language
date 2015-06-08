@@ -27,6 +27,7 @@ library
   default-language:    Haskell2010
   exposed-modules: OnPing.DataServer.Language
                    OnPing.DataServer.Language.Parser
+                   OnPing.DataServer.Language.Docs
   ghc-options: -Wall -O2 -ddump-splices
 
 executable opdl-c
@@ -36,3 +37,11 @@ executable opdl-c
   hs-source-dirs: main
   main-is: Main.hs
   ghc-options: -Wall -O2
+
+executable data-language-docs
+  default-language: Haskell2010
+  build-depends: base == 4.*
+               , onping-data-language
+  hs-source-dirs: main
+  main-is: Docs.hs
+  ghc-options: -Wall
