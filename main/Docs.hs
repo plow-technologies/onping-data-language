@@ -2,7 +2,9 @@
 module Main (main) where
 
 import OnPing.DataServer.Language.Docs
+import System.Directory (createDirectoryIfMissing)
 
 main :: IO ()
 main = do
-  writeFile "commands.md" commandDoc
+  createDirectoryIfMissing True "docs"
+  writeFile "docs/commands.md" commandDoc

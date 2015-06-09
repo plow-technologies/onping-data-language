@@ -1,0 +1,30 @@
+machine:
+  ghc:
+    version: 7.10.1
+
+dependencies:
+  override:
+    - git clone git@github.com:plow-technologies/plow-scripts.git
+    - cp plow-scripts/config $HOME/.cabal/config
+    - cabal update
+    - cabal install --only-dependencies --force-reinstalls
+
+test:
+  override:
+    - cabal configure
+    - cabal build
+
+deployment:
+  staging:
+    branch: master
+    commands:
+      - cabal run data-language-docs
+      # Git info
+      - git config --global user.email "daniel.casanueva@plowtech.net"
+      - git config --global user.name "Daniel Díaz"
+      # Git update
+      - git add 'docs/*'
+      - git commit -a -m "Automatic documentation update."
+      - git push
+      # Upload to Hackage
+      - sh plow-scripts/hackage.sh
