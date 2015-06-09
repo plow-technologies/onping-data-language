@@ -1,4 +1,6 @@
 
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+
 module OnPing.DataServer.Language.TH (
     th_var
   , th_App
