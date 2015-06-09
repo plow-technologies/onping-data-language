@@ -24,7 +24,7 @@ deployment:
       - git config --global user.name "Daniel Díaz"
       # Git update
       - git add 'docs/*'
-      - git commit -a -m "Automatic documentation update."
+      - git commit --allow-empty -a -m "Automatic documentation update."
       - git push
       # Upload to Hackage
       - sh plow-scripts/hackage.sh
