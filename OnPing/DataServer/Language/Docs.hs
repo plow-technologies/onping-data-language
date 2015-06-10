@@ -46,7 +46,16 @@ allCommands = $(fmap TH.ListE $ th_Type "Command" $ \c ts -> return $ foldl (\r 
 
 -- | Explanation of commands using markdown.
 commandExplanation :: Command -> String
+commandExplanation (Print _) = "Display a value on the screen."
 commandExplanation Exit = "Interrupt the execution of the script by sending an `Exit` error."
+commandExplanation (Assert _) = unlines
+  [ "First, it evaluates the given boolean expression. If the result"
+  , "is `true`, no further action is performed. However, if the result"
+  , "is `false`, `assert` will throw an `AssertionFailed` error. This"
+  , "is useful if you want to stop the execution if certain condition"
+  , "is not fulfilled."
+    ]
+-- Default message
 commandExplanation _ = "_This command has not been documented yet._"
 
 -- commandName :: Command -> String
