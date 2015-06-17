@@ -6,7 +6,7 @@
 !print <Value expression>
 ```
 
-_This command has not been documented yet._
+Display a value on the screen.
 
 ## exit
 
@@ -22,7 +22,12 @@ Interrupt the execution of the script by sending an `Exit` error.
 !assert <Bool expression>
 ```
 
-_This command has not been documented yet._
+First, it evaluates the given boolean expression. If the result
+is `true`, no further action is performed. However, if the result
+is `false`, `assert` will throw an `AssertionFailed` error. This
+is useful if you want to stop the execution if certain condition
+is not fulfilled.
+
 
 ## newarray
 
