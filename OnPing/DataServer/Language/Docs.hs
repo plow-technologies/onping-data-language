@@ -25,7 +25,7 @@ instance SyntaxDoc Ident where
   syntaxDoc _ = "<identifier>"
 
 instance Typeable a => SyntaxDoc (Exp a) where
-  syntaxDoc e = "<" ++ show (typeRep e) ++ " expression>"
+  syntaxDoc e = "[ <" ++ show (typeRep e) ++ " expression> ]"
 
 $(fmap (pure . TH.InstanceD [] (TH.ConT "SyntaxDoc" `TH.AppT` TH.ConT "Command") . pure . TH.FunD "syntaxDoc")
   $ th_Type "Command" $ \c ts -> do
@@ -58,10 +58,11 @@ commandExplanation (Assert _) = unlines
 -- Default message
 commandExplanation _ = "_This command has not been documented yet._"
 
--- commandName :: Command -> String
-$(fmap (pure . TH.FunD "commandName") $ th_Type "Command" $ \c ts -> do
+commandName :: Command -> String
+commandName cm = $(do
+  fmap (TH.CaseE $ TH.VarE "cm") $ th_Type "Command" $ \c ts -> do
     let str = fmap toLower $ TH.nameBase c
-    return $ TH.Clause [TH.ConP c $ fmap (const $ TH.WildP) ts] (TH.NormalB $ fromString str) []
+    return $ TH.Match (TH.ConP c $ fmap (const $ TH.WildP) ts) (TH.NormalB $ fromString str) []
  )
 
 -- | Command documentation.

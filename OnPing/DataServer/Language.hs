@@ -337,6 +337,7 @@ data Command =
   | RemoveKey (Exp Key)
   | GetTimeBounds Ident Ident
   | SetTimeBounds (Exp Int) (Exp Int)
+  | Sync
 
 runCommand :: Command -> Eval ()
 runCommand (Print e) = evalExp e >>= liftIO . putStrLn . displayValue
@@ -365,6 +366,7 @@ runCommand (SetTimeBounds lbe ube) = do
   lb <- evalExp lbe
   ub <- evalExp ube
   clientActionM $ clientSetTimeBounds (lb,ub)
+runCommand Sync = clientActionM clientSync
 
 clientAction :: Client IO a -> Eval a
 clientAction c = do
@@ -426,5 +428,5 @@ prelude = do
   -- Keys
   assign "Key" Key
   -- Server default info
-  assign "server" ("127.0.0.1" :: Text)
+  assign "server" ("sltime.plowtech.net" :: Text)
   assign "port" (5000 :: Int)
