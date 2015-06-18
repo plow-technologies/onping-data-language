@@ -70,6 +70,11 @@ commandDoc :: String
 commandDoc = unlines
   [ "# Commands"
   , ""
+  , unlines $ fmap
+     (\c -> let n = commandName c
+            in  "* [" ++ n ++ "](#" ++ n ++ ")"
+       ) allCommands
+  , ""
   , unlines $ fmap (\c -> unlines
      [ "## " ++ commandName c
      , ""
