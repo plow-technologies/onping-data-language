@@ -14,7 +14,7 @@ import qualified Language.Haskell.TH as TH
 import OnPing.DataServer.Language.TH
 -- base
 import Data.Char (toLower)
-import Data.List (intercalate)
+import Data.List (intercalate, sortOn)
 import Data.Typeable (Typeable, typeRep)
 import Data.String (fromString)
 
@@ -42,7 +42,7 @@ $(fmap (pure . TH.InstanceD [] (TH.ConT "SyntaxDoc" `TH.AppT` TH.ConT "Command")
  )
 
 allCommands :: [Command]
-allCommands = $(fmap TH.ListE $ th_Type "Command" $ \c ts -> return $ foldl (\r _ -> TH.AppE r $ TH.VarE "undefined") (TH.ConE c) ts)
+allCommands = sortOn commandName $(fmap TH.ListE $ th_Type "Command" $ \c ts -> return $ foldl (\r _ -> TH.AppE r $ TH.VarE "undefined") (TH.ConE c) ts)
 
 -- | Explanation of commands using markdown.
 commandExplanation :: Command -> String
