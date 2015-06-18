@@ -3,7 +3,7 @@
 ## print
 
 ```
-!print <Value expression>
+!print [ <Value expression> ]
 ```
 
 Display a value on the screen.
@@ -19,7 +19,7 @@ Interrupt the execution of the script by sending an `Exit` error.
 ## assert
 
 ```
-!assert <Bool expression>
+!assert [ <Bool expression> ]
 ```
 
 First, it evaluates the given boolean expression. If the result
@@ -32,7 +32,7 @@ is not fulfilled.
 ## newarray
 
 ```
-!newarray <identifier> <Int expression>
+!newarray <identifier> [ <Int expression> ]
 ```
 
 _This command has not been documented yet._
@@ -40,7 +40,7 @@ _This command has not been documented yet._
 ## setarray
 
 ```
-!setarray <identifier> <Int expression> <Value expression>
+!setarray <identifier> [ <Int expression> ] [ <Value expression> ]
 ```
 
 _This command has not been documented yet._
@@ -56,7 +56,7 @@ _This command has not been documented yet._
 ## removekey
 
 ```
-!removekey <Key expression>
+!removekey [ <Key expression> ]
 ```
 
 _This command has not been documented yet._
@@ -72,7 +72,15 @@ _This command has not been documented yet._
 ## settimebounds
 
 ```
-!settimebounds <Int expression> <Int expression>
+!settimebounds [ <Int expression> ] [ <Int expression> ]
+```
+
+_This command has not been documented yet._
+
+## sync
+
+```
+!sync
 ```
 
 _This command has not been documented yet._
