@@ -1,5 +1,17 @@
 # Commands
 
+* [assert](#assert)
+* [exit](#exit)
+* [getallkeys](#getallkeys)
+* [gettimebounds](#gettimebounds)
+* [newarray](#newarray)
+* [print](#print)
+* [removekey](#removekey)
+* [setarray](#setarray)
+* [settimebounds](#settimebounds)
+* [sync](#sync)
+
+
 ## assert
 
 ```
