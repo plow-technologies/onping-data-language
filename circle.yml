@@ -19,8 +19,8 @@ deployment:
     branch: master
     commands:
       # Git info
-      - git config --global user.email "daniel.casanueva@plowtech.net"
-      - git config --global user.name "Daniel Díaz"
+      - git config --global user.email "ar@plowtech.net"
+      - git config --global user.name "plowtech-bot"
       # Git update
       - git pull # pull just in case!
       - cabal run data-language-docs
