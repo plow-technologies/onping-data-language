@@ -338,6 +338,7 @@ data Command =
   | GetTimeBounds Ident Ident
   | SetTimeBounds (Exp Int) (Exp Int)
   | Sync
+  | MemoryUsage Ident
 
 runCommand :: Command -> Eval ()
 runCommand (Print e) = evalExp e >>= liftIO . putStrLn . displayValue
@@ -367,6 +368,7 @@ runCommand (SetTimeBounds lbe ube) = do
   ub <- evalExp ube
   clientActionM $ clientSetTimeBounds (lb,ub)
 runCommand Sync = clientActionM clientSync
+runCommand (MemoryUsage v) = clientActionE clientMemoryUsage >>= assign v
 
 clientAction :: Client IO a -> Eval a
 clientAction c = do
