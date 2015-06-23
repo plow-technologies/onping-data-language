@@ -4,6 +4,7 @@
 * [exit](#exit)
 * [getallkeys](#getallkeys)
 * [gettimebounds](#gettimebounds)
+* [memoryusage](#memoryusage)
 * [newarray](#newarray)
 * [print](#print)
 * [removekey](#removekey)
@@ -45,6 +46,14 @@ _This command has not been documented yet._
 
 ```
 !gettimebounds <identifier> <identifier>
+```
+
+_This command has not been documented yet._
+
+## memoryusage
+
+```
+!memoryusage <identifier>
 ```
 
 _This command has not been documented yet._
