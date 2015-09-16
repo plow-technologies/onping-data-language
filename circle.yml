@@ -29,5 +29,6 @@ deployment:
       - git add 'docs/*'
       - git diff-index --quiet HEAD || git commit -a -m "Automatic documentation update."
       - git push
+      - rsync -av -e ssh dist/build/opdl-c/opdl-c daniel@sltime.plowtech.net:~/onping-data-language/
       # Upload to Hackage
       - sh plow-scripts/hackage.sh
