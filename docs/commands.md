@@ -4,6 +4,7 @@
 * [exit](#exit)
 * [getallkeys](#getallkeys)
 * [gettimebounds](#gettimebounds)
+* [keyinfo](#keyinfo)
 * [memoryusage](#memoryusage)
 * [newarray](#newarray)
 * [print](#print)
@@ -47,6 +48,14 @@ _This command has not been documented yet._
 
 ```
 !gettimebounds <identifier> <identifier>
+```
+
+_This command has not been documented yet._
+
+## keyinfo
+
+```
+!keyinfo [ <Key expression> ] <identifier> <identifier> <identifier>
 ```
 
 _This command has not been documented yet._
