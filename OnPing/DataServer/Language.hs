@@ -302,12 +302,12 @@ data Control =
     While (Exp Bool) Script
   | ForEach Ident Ident Script
   | Isolate Script
+  | When (Exp Bool) Script
 
 runControl :: Control -> Eval ()
 runControl (While e scr) = do
   b <- evalExp e
-  if b then runScript scr >> runControl (While e scr)
-       else return ()
+  when b $ runScript scr >> runControl (While e scr)
 runControl (ForEach arrv v scr) = do
   arr <- arrayIn arrv
   let n = V.length arr
@@ -329,6 +329,9 @@ runControl (Isolate scr) = do
         Left err -> liftIO $ putStrLn $ "ERROR (ISOLATED): Line " ++ show (currentLine isoct) ++ ": " ++ displayError err
         _ -> return ()
       lift $ put $ ct { actionNumber = actionNumber isoct }
+runControl (When e scr) = do
+  b <- evalExp e
+  when b $ runScript scr
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
