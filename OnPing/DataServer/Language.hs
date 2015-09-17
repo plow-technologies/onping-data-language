@@ -374,7 +374,7 @@ runCommand (MemoryUsage v) = clientActionE clientMemoryUsage >>= assign v
 runCommand (Truncate ke te) = do
   k <- evalExp ke
   t <- evalExp te
-  clientActionM $ clientTruncate ke te
+  clientActionM $ clientTruncate k t
 
 clientAction :: Client IO a -> Eval a
 clientAction c = do
