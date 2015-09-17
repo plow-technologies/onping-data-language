@@ -47,6 +47,7 @@ import Data.Vector.Mutable (IOVector)
 import qualified Data.Vector.Mutable as V
 import qualified Data.Vector as FV
 import System.Microtimer (time, formatSeconds)
+import Data.Word (Word8)
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -169,7 +170,7 @@ instance (ToValue a, ToValue b) => ToValue (Either a b) where
 instance (FromValue a, FromValue b) => FromValue (Either a b) where
   fromValue v = (Left <$> fromValue v) <|> (Right <$> fromValue v)
 
-instance ToValue Exponent where
+instance ToValue Word8 where
   toValue = toValue . (fromIntegral :: Exponent -> Int)
 
 -------------------------------------------------------------------------------
