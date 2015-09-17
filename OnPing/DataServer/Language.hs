@@ -454,7 +454,7 @@ prelude = do
   assign "display" (pack . displayValue :: Value -> Text)
   -- Keys
   assign "Key" Key
-  assign "keypid" keypid
+  assign "keypid" keyPID
   -- Server default info
   assign "server" ("127.0.0.1" :: Text)
   assign "port" (5000 :: Int)
