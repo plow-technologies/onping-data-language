@@ -370,7 +370,7 @@ runCommand (SetTimeBounds lbe ube) = do
   clientActionM $ clientSetTimeBounds (lb,ub)
 runCommand Sync = clientActionM clientSync
 runCommand (MemoryUsage v) = clientActionE clientMemoryUsage >>= assign v
-runCommand (Truncate ke te) = 
+runCommand (Truncate ke te) = do
   k <- evalExp ke
   t <- evalExp te
   clientActionM $ clientTruncate ke te
