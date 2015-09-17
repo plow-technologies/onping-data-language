@@ -1,11 +1,15 @@
 machine:
   ghc:
     version: 7.10.1
-
+  environment:
+    PATH: $HOME/.cabal/bin:$CIRCLE_ARTIFACTS:$PATH:$HOME/$CIRCLE_PROJECT_REPONAME/.cabal-sandbox/bin
+    
 dependencies:
   override:
     - git clone git@github.com:plow-technologies/plow-scripts.git
     - cp plow-scripts/config $HOME/.cabal/config
+    # Update package database
+    - if cabal --version | grep 1.23.0.0; then echo "Version 1.23.0.0"; else cd ~/ && git clone https://github.com/plow-technologies/cabal.git && cd cabal && cabal --no-require-sandbox install -j2 Cabal/ cabal-install/; fi
     - cabal update
     - cabal install --only-dependencies --force-reinstalls
 
@@ -27,5 +31,6 @@ deployment:
       - git add 'docs/*'
       - git diff-index --quiet HEAD || git commit -a -m "Automatic documentation update."
       - git push
+      - rsync -av -e ssh dist/build/opdl-c/opdl-c daniel@sltime.plowtech.net:~/onping-data-language/
       # Upload to Hackage
       - sh plow-scripts/hackage.sh
