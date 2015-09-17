@@ -169,6 +169,9 @@ instance (ToValue a, ToValue b) => ToValue (Either a b) where
 instance (FromValue a, FromValue b) => FromValue (Either a b) where
   fromValue v = (Left <$> fromValue v) <|> (Right <$> fromValue v)
 
+instance ToValue Exponent where
+  toValue = toValue . (fromIntegral :: Exponent -> Int)
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 -- Expressions
