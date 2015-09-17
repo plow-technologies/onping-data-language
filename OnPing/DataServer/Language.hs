@@ -359,7 +359,7 @@ runCommand (SetArray v ei ex) = do
   unless (0 <= i && i < n) $ throwE $ OutOfBounds i n
   x <- evalExp ex
   liftIO $ V.unsafeWrite arr i x
-runCommand (GetAllKeys arr) = clientActionE (clientAllKeys :: Client IO [Key]) >>= listArray arr
+runCommand (GetAllKeys arr) = (clientActionE clientAllKeys :: Eval [Key]) >>= listArray arr
 runCommand (RemoveKey k) = evalExp k >>= clientActionM . clientRemove
 runCommand (GetTimeBounds lbv ubv) = do
   (lb,ub) <- clientActionE clientGetTimeBounds
