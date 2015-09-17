@@ -11,6 +11,7 @@
 * [setarray](#setarray)
 * [settimebounds](#settimebounds)
 * [sync](#sync)
+* [truncate](#truncate)
 
 
 ## assert
@@ -102,6 +103,14 @@ _This command has not been documented yet._
 
 ```
 !sync
+```
+
+_This command has not been documented yet._
+
+## truncate
+
+```
+!truncate [ <Key expression> ] [ <Int expression> ]
 ```
 
 _This command has not been documented yet._
