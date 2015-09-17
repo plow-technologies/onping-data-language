@@ -341,6 +341,7 @@ data Command =
   | Sync
   | MemoryUsage Ident
   | Truncate (Exp Key) (Exp Int)
+  | KeyInfo (Exp Key) Ident Ident Ident -- ^ Returns t0, size, and pointers
 
 runCommand :: Command -> Eval ()
 runCommand (Print e) = evalExp e >>= liftIO . putStrLn . displayValue
@@ -375,6 +376,12 @@ runCommand (Truncate ke te) = do
   k <- evalExp ke
   t <- evalExp te
   clientActionM $ clientTruncate k t
+runCommand (KeyInfo ke t0v sv ptrsv) = do
+  k <- evalExp ke
+  kinfo <- clientActionE $ clientInfo k
+  assign   t0v $ kinfo_Time kinfo
+  assign    sv $ kinfo_Size kinfo
+  assign ptrsv $ kinfo_Pointers kinfo
 
 clientAction :: Client IO a -> Eval a
 clientAction c = do
@@ -436,5 +443,5 @@ prelude = do
   -- Keys
   assign "Key" Key
   -- Server default info
-  assign "server" ("sltime.plowtech.net" :: Text)
+  assign "server" ("127.0.0.1" :: Text)
   assign "port" (5000 :: Int)
