@@ -62,6 +62,7 @@ data Error =
   | ExitCall
   | AssertionFailed
   | OutOfBounds Int Int
+  | KeyNotFound Key
 
 displayError :: Error -> String
 displayError (RawError err) = err
@@ -73,6 +74,7 @@ displayError Void = "Void"
 displayError ExitCall = "Exit call"
 displayError AssertionFailed = "Assertion failed"
 displayError (OutOfBounds i n) = "Out of bounds: " ++ show i ++ " in " ++ show (0 :: Int, n)
+displayError (KeyNotFound k) = "Not found: " ++ show k
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -378,10 +380,13 @@ runCommand (Truncate ke te) = do
   clientActionM $ clientTruncate k t
 runCommand (KeyInfo ke t0v sv ptrsv) = do
   k <- evalExp ke
-  kinfo <- clientActionE $ clientInfo k
-  assign   t0v $ kinfo_Time kinfo
-  assign    sv $ kinfo_Size kinfo
-  assign ptrsv $ kinfo_Pointers kinfo
+  mkinfo <- clientActionE $ clientInfo k
+  case mkinfo of
+    Just kinfo -> do
+      assign   t0v $ kinfo_Time kinfo
+      assign    sv $ kinfo_Size kinfo
+      assign ptrsv $ kinfo_Pointers kinfo
+    _ -> throwE $ KeyNotFound k
 
 clientAction :: Client IO a -> Eval a
 clientAction c = do
