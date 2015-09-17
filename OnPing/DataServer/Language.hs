@@ -30,6 +30,7 @@ module OnPing.DataServer.Language (
 
 import Data.Text (Text, unpack, pack)
 import OnPing.DataServer.Client
+import OnPing.DataServer.Client.Key (Key (..))
 import Control.Monad.Trans.Except
 import Control.Monad.Trans.State
 import Data.Map (Map)
