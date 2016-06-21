@@ -395,20 +395,20 @@ runCommand (KeyInfo ke t0v sv ptrsv) = do
       assign ptrsv $ kinfo_Pointers kinfo
     _ -> throwE $ KeyNotFound k
 
-clientAction :: Client IO a -> Eval a
+clientAction :: Client Key IO a -> Eval a
 clientAction c = do
   server <- valueOf "server"
   port <- valueOf "port"
   liftIO $ runClient (AwayServer OnPingData (unpack server) port) c
 
-clientActionM :: Client IO (Maybe String) -> Eval ()
+clientActionM :: Client Key IO (Maybe String) -> Eval ()
 clientActionM c = do
   merr <- clientAction c
   case merr of
     Just err -> throwE $ ClientError err
     _ -> return ()
 
-clientActionE :: Client IO (Either String a) -> Eval a
+clientActionE :: Client Key IO (Either String a) -> Eval a
 clientActionE c = do
   ex <- clientAction c
   case ex of
