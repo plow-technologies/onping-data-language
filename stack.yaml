@@ -63,6 +63,8 @@ extra-deps:
 - dataenc-0.12
 - Crypto-4.2.5.1
 - microtimer-0.0.1.2
+- gnuplot-0.5.4.1
+- data-accessor-transformers-0.2.1.7
 
 # Override default flag values for local packages and extra-deps
 flags: {}

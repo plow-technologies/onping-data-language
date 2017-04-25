@@ -27,7 +27,7 @@ instance SyntaxDoc Ident where
 instance Typeable a => SyntaxDoc (Exp a) where
   syntaxDoc e = "[ <" ++ show (typeRep e) ++ " expression> ]"
 
-$(fmap (pure . TH.InstanceD [] (TH.ConT "SyntaxDoc" `TH.AppT` TH.ConT "Command") . pure . TH.FunD "syntaxDoc")
+$(fmap (pure . TH.InstanceD Nothing [] (TH.ConT "SyntaxDoc" `TH.AppT` TH.ConT "Command") . pure . TH.FunD "syntaxDoc")
   $ th_Type "Command" $ \c ts -> do
       vs <- mapM (const $ TH.newName "arg") ts
       let str = "!" ++ fmap toLower (TH.nameBase c)

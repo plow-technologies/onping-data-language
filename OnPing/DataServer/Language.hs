@@ -48,6 +48,8 @@ import qualified Data.Vector.Mutable as V
 import qualified Data.Vector as FV
 import System.Microtimer (time, formatSeconds)
 import Data.Word (Word8)
+import qualified Graphics.Gnuplot.Simple as Plot
+import Onping.Types.TagInfo (PID (..))
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -88,6 +90,7 @@ data Value =
   | VDouble Double
   | VText Text
   | VKey Key
+  | VPID PID
   | VFun (Value -> Value)
 
 displayValue :: Value -> String
@@ -97,6 +100,7 @@ displayValue (VInt n) = show n
 displayValue (VDouble x) = show $ showFFloat (Just 5) x []
 displayValue (VText t) = unpack t
 displayValue (VKey k) = show k
+displayValue (VPID pid) = show pid
 displayValue (VFun _) = "<function>"
 
 applyValue :: Value -> Value -> Value
@@ -155,6 +159,13 @@ instance ToValue Key where
 
 instance FromValue Key where
   fromValue (VKey k) = Just k
+  fromValue _ = Nothing
+
+instance ToValue PID where
+  toValue = VPID
+
+instance FromValue PID where
+  fromValue (VPID pid) = Just pid
   fromValue _ = Nothing
 
 instance (FromValue a, ToValue b) => ToValue (a -> b) where
@@ -351,6 +362,7 @@ data Command =
   | MemoryUsage Ident
   | Truncate (Exp Key) (Exp Int)
   | KeyInfo (Exp Key) Ident Ident Ident -- ^ Returns t0, size, and pointers
+  | DensityGraph (Exp Text) (Exp Key)
 
 runCommand :: Command -> Eval ()
 runCommand (Print e) = evalExp e >>= liftIO . putStrLn . displayValue
@@ -394,6 +406,16 @@ runCommand (KeyInfo ke t0v sv ptrsv) = do
       assign    sv $ kinfo_Size kinfo
       assign ptrsv $ kinfo_Pointers kinfo
     _ -> throwE $ KeyNotFound k
+runCommand (DensityGraph fpe ke) = do
+  fp <- evalExp fpe
+  k  <- evalExp ke
+  xs <- clientActionE $ clientDensity k
+  liftIO $ Plot.plotList
+    [ Plot.PNG $ unpack fp
+    , Plot.XLabel "Chunk Index"
+    , Plot.YLabel "Density"
+    , Plot.Title "Density Function"
+      ] xs
 
 clientAction :: Client Key IO a -> Eval a
 clientAction c = do

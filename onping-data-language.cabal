@@ -21,6 +21,8 @@ library
                , template-haskell
                , vector
                , microtimer
+               , gnuplot
+               , onping-base-types
   default-language:    Haskell2010
   exposed-modules: OnPing.DataServer.Language
                    OnPing.DataServer.Language.Parser

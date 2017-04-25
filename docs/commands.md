@@ -1,6 +1,7 @@
 # Commands
 
 * [assert](#assert)
+* [densitygraph](#densitygraph)
 * [exit](#exit)
 * [getallkeys](#getallkeys)
 * [gettimebounds](#gettimebounds)
@@ -27,6 +28,14 @@ is `false`, `assert` will throw an `AssertionFailed` error. This
 is useful if you want to stop the execution if certain condition
 is not fulfilled.
 
+
+## densitygraph
+
+```
+!densitygraph [ <Text expression> ] [ <Key expression> ]
+```
+
+_This command has not been documented yet._
 
 ## exit
 

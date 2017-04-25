@@ -30,7 +30,7 @@ th_Type tyn f = do
   case info of
     TyConI typeDec ->
       case typeDec of
-        DataD _ _ _ cs _ ->
+        DataD _ _ _ _ cs _ ->
           mapM (\c ->
                  case c of
                    NormalC cn ts -> f cn $ fmap snd ts
